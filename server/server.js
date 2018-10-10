@@ -25,6 +25,21 @@ app.post("/todos", (req, res) => {
   );
 });
 
+app.post("/users", (req, res) => {
+  var newUser = new User({
+    email: req.body.email
+  });
+  newUser.save().then(
+    doc => {
+      console.log(doc);
+      res.send(doc);
+    },
+    e => {
+      console.log(e);
+      res.status(400).send(e);
+    }
+  );
+});
 app.listen(3000, () => {
   console.log("Lisening to port 3000");
 });
