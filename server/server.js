@@ -1,9 +1,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
-var { Todo } = require("../modules/todos");
+var { Todo } = require("../models/todos");
 var { mongoose } = require("../db/db.js");
-var { User } = require("../modules/users");
+var { User } = require("../models/users");
 
 var app = express();
 app.use(bodyParser.json());
