@@ -15,7 +15,7 @@ app.post("/todos", (req, res) => {
 
   newTodo.save().then(
     doc => {
-      console.log(doc);
+      //console.log(doc);
       res.status(200).send(doc);
     },
     e => {
@@ -40,6 +40,19 @@ app.post("/users", (req, res) => {
     }
   );
 });
+
+// GET Todos route
+app.get("/todos", (req, res) => {
+  Todo.find().then(
+    todos => {
+      res.send({ todos });
+    },
+    e => {
+      res.status(400).send(e);
+    }
+  );
+});
+
 app.listen(3000, () => {
   console.log("Lisening to port 3000");
 });
