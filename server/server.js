@@ -19,7 +19,7 @@ app.post("/todos", (req, res) => {
       res.status(200).send(doc);
     },
     e => {
-      console.log(e);
+      // console.log(e);
       res.status(400).send(e);
     }
   );
@@ -43,3 +43,5 @@ app.post("/users", (req, res) => {
 app.listen(3000, () => {
   console.log("Lisening to port 3000");
 });
+
+module.exports = { app };
