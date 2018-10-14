@@ -1,3 +1,4 @@
+require("./config/config");
 const express = require("express");
 const bodyParser = require("body-parser");
 const { ObjectId } = require("mongodb");
@@ -87,7 +88,7 @@ app.delete("/todos/:id", (req, res) => {
   );
 });
 app.listen(3000, () => {
-  console.log("Lisening to port 3000");
+  console.log(`Lisening to port ${process.env.PORT}`);
 });
 app.patch("/todos/:id", (req, res) => {
   var id = req.params.id;
