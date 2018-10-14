@@ -70,6 +70,21 @@ app.get("/todos", (req, res) => {
   );
 });
 
+// DELETE Todos/:id route
+app.delete("/todos/:id", (req, res) => {
+  var id = req.params.id;
+  if (!ObjectId.isValid(req.params.id)) return res.status(404).send();
+
+  Todo.findByIdAndRemove(id).then(
+    todo => {
+      if (!todo) return res.status(404).send();
+      res.send(todo);
+    },
+    e => {
+      res.status(404).send();
+    }
+  );
+});
 app.listen(3000, () => {
   console.log("Lisening to port 3000");
 });
