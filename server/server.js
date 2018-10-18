@@ -28,9 +28,8 @@ app.post("/todos", (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-  var newUser = new User({
-    email: req.body.email
-  });
+  let body = _.pick(req.body, ["email", "password"]);
+  var newUser = new User(body);
   newUser.save().then(
     doc => {
       console.log(doc);
@@ -90,6 +89,8 @@ app.delete("/todos/:id", (req, res) => {
 app.listen(3000, () => {
   console.log(`Lisening to port ${process.env.PORT}`);
 });
+
+// Update(PATCH) Todos/:id route
 app.patch("/todos/:id", (req, res) => {
   var id = req.params.id;
   if (!ObjectId.isValid(id)) return res.status(404).send();
