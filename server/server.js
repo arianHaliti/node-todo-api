@@ -2,10 +2,12 @@ require("./config/config");
 const express = require("express");
 const bodyParser = require("body-parser");
 const { ObjectId } = require("mongodb");
+const _ = require("lodash");
+
 var { Todo } = require("../models/todos");
 var { mongoose } = require("../db/db.js");
 var { User } = require("../models/users");
-const _ = require("lodash");
+var { authenticate } = require("./middleware/authenticate");
 
 var app = express();
 app.use(bodyParser.json());
@@ -42,6 +44,11 @@ app.post("/users", (req, res) => {
       res.status(400).send(e);
     });
 });
+
+app.get("/users/me", authenticate, (req, res) => {
+  res.send(req.user);
+});
+
 // GET Todos/:id route
 
 app.get("/todos/:id", (req, res) => {
