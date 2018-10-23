@@ -30,16 +30,17 @@ app.post("/todos", (req, res) => {
 app.post("/users", (req, res) => {
   let body = _.pick(req.body, ["email", "password"]);
   var newUser = new User(body);
-  newUser.save().then(
-    doc => {
-      console.log(doc);
-      res.send(doc);
-    },
-    e => {
-      console.log(e);
+  newUser
+    .save()
+    .then(user => {
+      return user.generateAuthToken();
+    })
+    .then(token => {
+      res.header("x-auth", token).send(newUser);
+    })
+    .catch(e => {
       res.status(400).send(e);
-    }
-  );
+    });
 });
 // GET Todos/:id route
 
