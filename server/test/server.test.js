@@ -1,30 +1,14 @@
 const expect = require("expect");
 const request = require("supertest");
 const { ObjectId } = require("mongodb");
+const { todos, populateTodos, users, populateUsers } = require("./seed/seed");
 
 var { app } = require("./../server");
 var { Todo } = require("./../../models/todos");
+var { User } = require("./../../models/users");
 
-const dummies = [
-  {
-    _id: new ObjectId(),
-    text: "First todo"
-  },
-  {
-    _id: new ObjectId(),
-    text: "Second todo",
-    completed: true,
-    completedAt: 333
-  }
-];
-
-beforeEach(done => {
-  Todo.deleteMany({})
-    .then(() => {
-      return Todo.insertMany(dummies);
-    })
-    .then(() => done());
-});
+beforeEach(populateTodos);
+beforeEach(populateUsers);
 
 describe("GET / Todos", () => {
   it("Should return all Todos", done => {
@@ -82,10 +66,10 @@ describe("POST / Todos", () => {
 describe(" GET /todos/:id", () => {
   it("should return todo doc", done => {
     request(app)
-      .get(`/todos/${dummies[0]._id.toHexString()}`)
+      .get(`/todos/${todos[0]._id.toHexString()}`)
       .expect(200)
       .expect(res => {
-        expect(res.body.todo.text).toBe(dummies[0].text);
+        expect(res.body.todo.text).toBe(todos[0].text);
       })
       .end(done);
   });
@@ -107,7 +91,7 @@ describe(" GET /todos/:id", () => {
 
 describe("DELET /todos/:id", () => {
   it("should  remove a todo", done => {
-    let id = dummies[1]._id.toHexString();
+    let id = todos[1]._id.toHexString();
 
     request(app)
       .delete(`/todos/${id}`)
@@ -142,7 +126,7 @@ describe("DELET /todos/:id", () => {
 });
 describe("PATCH /todos:id", () => {
   it("should updae the todo", done => {
-    let id = dummies[0]._id.toHexString();
+    let id = todos[0]._id.toHexString();
     var text = "This should be new text";
     request(app)
       .patch(`/todos/${id}`)
@@ -160,7 +144,7 @@ describe("PATCH /todos:id", () => {
   });
 
   it("should clear completedAt when todo is not completed", done => {
-    let id = dummies[1]._id.toHexString();
+    let id = todos[1]._id.toHexString();
     var text = "Updating test Text";
     request(app)
       .patch(`/todos/${id}`)
@@ -174,6 +158,63 @@ describe("PATCH /todos:id", () => {
         expect(res.body.todo.text).toBe(text);
         expect(res.body.todo.completedAt).toNotExist();
       })
+      .end(done);
+  });
+});
+describe("GET /users/me", () => {
+  it("should return user if authenticated", done => {
+    request(app)
+      .get("/users/me")
+      .set("x-auth", users[0].tokens[0].token)
+      .expect(200)
+      .expect(res => {
+        expect(res.body._id).toBe(users[0]._id.toHexString());
+        expect(res.body.email).toBe(users[0].email);
+      })
+      .end(done);
+  });
+  it("should return 401 if not authenticated", done => {
+    request(app)
+      .get("/users/me")
+      .expect(401)
+      .expect(res => {
+        expect(res.body).toEqual({});
+      })
+      .end(done);
+  });
+});
+describe("POST /users ", () => {
+  it("should create a new user", done => {
+    request(app)
+      .post("/users")
+      .send({ email: "example@g.com", password: "123123" })
+      .expect(200)
+      .expect(res => {
+        expect(res.body.email).toExist();
+        expect(res.headers["x-auth"]).toExist();
+        expect(res.body._id).toExist();
+      })
+      .end(err => {
+        if (err) return done(err);
+        User.findOne({ email: "example@g.com" }).then(user => {
+          expect(user).toExist();
+          expect(user.password).toNotBe("123123");
+          done();
+        });
+      });
+  });
+  it("should return validation errors if request invalid", done => {
+    request(app)
+      .post("/users")
+      .send({ email: "mani@g.com", password: "222" })
+      .expect(400)
+      .end(done);
+  });
+  it("should not create user if email in use", done => {
+    request(app)
+      .post("/users")
+      .send({ email: "arain@g.com", password: "1231231" })
+      .expect(400)
       .end(done);
   });
 });
