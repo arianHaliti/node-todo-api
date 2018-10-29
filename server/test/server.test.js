@@ -272,7 +272,6 @@ describe("POST /user/login", () => {
       });
   });
 });
-
 describe("Delete /users/me/token", () => {
   it("should remove auth token on logout", done => {
     request(app)
@@ -283,8 +282,8 @@ describe("Delete /users/me/token", () => {
         if (e) return done(e);
         User.findById(users[0]._id)
           .then(user => {
-            expect(user.token.length).toBe(0);
-            done;
+            expect(user.tokens.length).toBe(0);
+            done();
           })
           .catch(e => done(e));
       });
