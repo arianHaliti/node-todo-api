@@ -1,5 +1,4 @@
 var env = process.env.NODE_ENV || "development";
-console.log("maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 console.log(`env ********* ${env}`);
 
 if (env === "development" || env === "test") {
@@ -8,7 +7,6 @@ if (env === "development" || env === "test") {
 
   Object.keys(envConfig).forEach(key => {
     process.env[key] = envConfig[key];
-    console.log(key, envConfig[key]);
   });
 }
 
